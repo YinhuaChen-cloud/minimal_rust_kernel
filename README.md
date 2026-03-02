@@ -24,12 +24,6 @@ sudo apt-get install -y gn ninja-build
 gn gen out/default
 ```
 
-如果你使用标准 Rust target，也可在生成时覆盖参数：
-
-```bash
-gn gen out/default --args='kernel_target="riscv64gc-unknown-none-elf"'
-```
-
 3. 编译内核：
 
 ```bash
