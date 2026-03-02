@@ -1,0 +1,15 @@
+toolchain("host") {
+  tool("stamp") {
+    command = "touch {{output}}"
+    description = "STAMP {{output}}"
+  }
+
+  tool("copy") {
+    command = "cp -f {{source}} {{output}}"
+    description = "COPY {{source}} {{output}}"
+  }
+
+  tool("action") {
+    description = "ACTION {{label}}"
+  }
+}

@@ -1,0 +1,32 @@
+declare_args() {
+  kernel_name = "minimal_rust_kernel"
+  kernel_target = "riscv64-vivo-blueos"
+  kernel_rustc = "rustc"
+}
+
+action("kernel") {
+  script = "//build/build_kernel.py"
+
+  inputs = [
+    "//src/main.rs",
+    "//src/entry.S",
+    "//linker.ld",
+  ]
+
+  outputs = [ "$root_build_dir/$kernel_name" ]
+
+  args = [
+    "--rustc",
+    kernel_rustc,
+    "--target",
+    kernel_target,
+    "--crate-name",
+    kernel_name,
+    "--src",
+    rebase_path("//src/main.rs", root_build_dir),
+    "--linker-script",
+    rebase_path("//linker.ld", root_build_dir),
+    "--out",
+    rebase_path(outputs[0], root_build_dir),
+  ]
+}

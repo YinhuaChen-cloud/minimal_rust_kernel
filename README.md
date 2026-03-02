@@ -7,9 +7,50 @@
 - `src/entry.S`：启动入口，设置栈并跳转到 `rust_main`
 - `src/main.rs`：`no_std` 内核主逻辑 + UART 输出
 - `linker.ld`：链接地址和段布局（起始 `0x80200000`）
-- `.cargo/config.toml`：默认目标和链接参数
+- `BUILD.gn`：GN 构建入口（`kernel` 目标）
+- `build/build_kernel.py`：实际调用 `rustc` 生成内核 ELF
 
-## 标准 Rust 工具链（推荐）
+## GN + Ninja（当前推荐）
+
+1. 安装依赖工具：
+
+```bash
+sudo apt-get install -y gn ninja-build
+```
+
+2. 生成构建目录（默认 target 为 `riscv64-vivo-blueos`）：
+
+```bash
+gn gen out/default
+```
+
+如果你使用标准 Rust target，也可在生成时覆盖参数：
+
+```bash
+gn gen out/default --args='kernel_target="riscv64gc-unknown-none-elf"'
+```
+
+3. 编译内核：
+
+```bash
+ninja -C out/default kernel
+```
+
+4. 运行（QEMU 默认 OpenSBI）：
+
+```bash
+qemu-system-riscv64 -machine virt -nographic -kernel out/default/minimal_rust_kernel
+```
+
+你会看到：
+
+```text
+hello world
+```
+
+## Cargo（兼容保留）
+
+如果你仍希望使用 Cargo，可继续使用原命令：
 
 1. 安装 target：
 
