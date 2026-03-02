@@ -1,20 +1,31 @@
+# 声明参数
 declare_args() {
   kernel_name = "minimal_rust_kernel"
   kernel_target = "riscv64-vivo-blueos"
   kernel_rustc = "rustc"
 }
 
+# GN 的 action 目标表示“执行一个脚本的构建步骤”。
+# 这里的 action("kernel") 会被规范化为标签 //:kernel。
+#
+# 关键点：
+# - gn gen 阶段：只把这条规则写入 Ninja，不执行脚本。
+# - ninja 阶段：当构建 kernel 时，才真正执行 script。
 action("kernel") {
+  # 实际执行的脚本。
   script = "//build/build_kernel.py"
 
+  # 输入依赖：这些文件变化会触发该 action 重新执行。
   inputs = [
     "//src/main.rs",
     "//src/entry.S",
     "//linker.ld",
   ]
 
+  # 输出产物：这个 action 最终要生成的文件。
   outputs = [ "$root_build_dir/$kernel_name" ]
 
+  # 传给脚本的参数；rebase_path 把源路径转换为相对 BUILD.gn 所在目录的路径。
   args = [
     "--rustc",
     kernel_rustc,

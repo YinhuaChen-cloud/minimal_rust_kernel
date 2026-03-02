@@ -1,14 +1,28 @@
+# 这个文件定义了一个最小可用的 GN 工具链：//build/toolchain:host
+#
+# 它的意义是告诉 GN：当目标选择该工具链时，Ninja 里应如何展开
+# 基础构建动作（stamp/copy/action）。
+#
+# 在本项目中，根 BUILD.gn 里的 action("kernel") 使用的就是这个工具链
+# （通过 build/BUILDCONFIG.gn 的 set_default_toolchain 指定）。
 toolchain("host") {
+  # stamp 是“打戳”规则，常用于占位或聚合依赖。
+  # {{output}} 是 GN 模板变量，会在生成 Ninja 时替换为具体输出路径。
   tool("stamp") {
     command = "touch {{output}}"
     description = "STAMP {{output}}"
   }
 
+  # copy 是文件复制规则，给 GN 内置 copy 目标类型使用。
+  # {{source}} / {{output}} 在 Ninja 中对应 ${in} / ${out}。
   tool("copy") {
     command = "cp -f {{source}} {{output}}"
     description = "COPY {{source}} {{output}}"
   }
 
+  # action 对应 GN 的 action(...) 目标类型。
+  # 这里不需要写 command：真正命令由 action 目标自己的 script + args 决定。
+  # 此处 description 只定义日志显示格式，{{label}} 会显示目标标签。
   tool("action") {
     description = "ACTION {{label}}"
   }

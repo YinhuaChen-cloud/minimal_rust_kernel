@@ -1,1 +1,2 @@
+# .gn 是 gn 首先寻找的文件，读取 buildconfig 的值然后跳转过去
 buildconfig = "//build/BUILDCONFIG.gn"
