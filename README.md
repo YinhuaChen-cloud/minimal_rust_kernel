@@ -42,6 +42,49 @@ qemu-system-riscv64 -machine virt -nographic -kernel out/default/minimal_rust_ke
 hello world
 ```
 
+## QEMU + GDB 单步调试（GN 构建）
+
+1. 准备工具（至少要有一个 GDB）：
+
+```bash
+sudo apt-get install -y qemu-system-misc gdb-multiarch
+```
+
+2. 构建带调试信息的内核（默认已开启 `-C debuginfo=2`）：
+
+```bash
+gn gen out/default
+ninja -C out/default kernel
+```
+
+3. 终端 A：启动 QEMU 并等待 GDB 连接（CPU 暂停在入口）：
+
+```bash
+./build/run_qemu_gdb.sh out/default/minimal_rust_kernel 1234
+```
+
+4. 终端 B：连接 GDB：
+
+```bash
+./build/run_gdb.sh out/default/minimal_rust_kernel 1234
+```
+
+5. 在 GDB 中单步（源码或地址映射二选一，这里给源码流）：
+
+```gdb
+continue
+list
+stepi
+x/i $pc
+info line *$pc
+```
+
+说明：
+
+- `break rust_main` 已在 `run_gdb.sh` 里自动设置。
+- `list` 可查看当前 Rust 源码位置。
+- `info line *$pc` 可查看当前地址到源码行的映射。
+
 ## Cargo（兼容保留）
 
 如果你仍希望使用 Cargo，可继续使用原命令：
